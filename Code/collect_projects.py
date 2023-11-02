@@ -39,8 +39,13 @@ def find_unavailable_urls(urls):
     already_judged = {"available": [], 'unavailable': []}
     if os.path.exists('database_file/availability.json'):
         already_judged = json.load(open('database_file/availability.json', "r"))
+    not_github = []
+    for u in already_judged["unavailable"]:
+        if "github.com" not in already_judged:
+            not_github.append(u)
     if len(already_judged['available']) + len(already_judged['unavailable']) == len(urls):
         print("skip url finding")
+        already_judged["unavailable"].extend(not_github)
         return already_judged['unavailable']
     for url in urls:
         if url in already_judged['available'] or url in already_judged['unavailable']:
@@ -70,6 +75,11 @@ def find_unavailable_urls(urls):
             cf.logger.debug(f'Reference {url} is available with code: {response.status_code}')
             already_judged['available'].append(url)
         json.dump(already_judged, open('database_file/availability.json', "w"))
+    not_github = []
+    for u in already_judged["unavailable"]:
+        if "github.com" not in already_judged:
+            not_github.append(u)
+    already_judged["unavailable"].extend(not_github)
     return already_judged['unavailable']
 
 
