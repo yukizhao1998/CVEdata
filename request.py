@@ -1,7 +1,7 @@
 import requests
 
-header = {"Authorization": "Bearer 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"}
-resp = requests.get("https://api.github.com/repo/yukizhao1998/CVEdata", headers=header)
+header = {"Authorization": "Bearer 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"}
+resp = requests.get("https://api.github.com/rate_limit", headers=header)
 print(resp.content)
 
 # from pydriller import Repository

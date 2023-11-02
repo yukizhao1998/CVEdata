@@ -251,7 +251,7 @@ def store_tables(df_fixes):
         size = get_repo_size(repo_url)
         if size is not None:
             size_dict[repo_url] = size
-    json.dump(size_dict, open("./database_file/size.json", "w"))
+        json.dump(size_dict, open("./database_file/size.json", "w"))
     print(size_dict)
     sorted_x = sorted(size_dict.items(), key=operator.itemgetter(1))
     print(sorted_x)
