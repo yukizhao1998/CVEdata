@@ -140,7 +140,6 @@ def get_repo_size(url):
         print("unavailable:", url)
         return None
     else:
-        print(response.content)
         return json.loads(response.content)['size']
 
 def get_repo_info(url):
@@ -246,6 +245,7 @@ def store_tables(df_fixes):
     if os.path.exists("./database_file/size.json"):
         size_dict = json.load(open("./database_file/size.json", "r"))
     for i, repo_url in enumerate(repo_urls):
+        print(str(i) + "/" + str(len(repo_urls)) + ":" + repo_url)
         if repo_url in size_dict.keys():
             continue
         size = get_repo_size(repo_url)
