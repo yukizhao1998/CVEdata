@@ -1,7 +1,7 @@
 import requests
 
-header = {"Authorization": "Bearer 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"}
-resp = requests.get("https://api.github.com/repos/ygunoil/Common-functions/contents", headers=header)
+header = {"Authorization": "Bearer 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"}
+resp = requests.get("https://api.github.com/rate_limit", headers=header)
 print(resp)
 
 # from pydriller import Repository
