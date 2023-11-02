@@ -126,10 +126,10 @@ def get_ref_links():
 
 def get_repo_size(url):
     header = {"Authorization": "Bearer " + cf.TOKEN}
-    proxies = {
-        "https": "127.0.0.1:55711",
-        "http": "127.0.0.1:55711"
-    }
+    # proxies = {
+    #     "https": "127.0.0.1:55711",
+    #     "http": "127.0.0.1:55711"
+    # }
     response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header, proxies=proxies)
     # GitLab responds to unavailable repositories by redirecting to their login page.
     # This code is a bit brittle with a hardcoded URL but we want to allow for projects
@@ -145,10 +145,10 @@ def get_repo_size(url):
 
 def get_repo_info(url):
     header = {"Authorization": "Bearer " + cf.TOKEN}
-    proxies = {
-        "https": "127.0.0.1:55711",
-        "http": "127.0.0.1:55711"
-    }
+    # proxies = {
+    #     "https": "127.0.0.1:55711",
+    #     "http": "127.0.0.1:55711"
+    # }
     response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header, proxies=proxies)
     # GitLab responds to unavailable repositories by redirecting to their login page.
     # This code is a bit brittle with a hardcoded URL but we want to allow for projects
@@ -243,7 +243,11 @@ def store_tables(df_fixes):
     # hashes = ['003c62d28ae438aa8943cb31535563397f838a2c', 'fd']
     pcount = 0
     size_dict = {}
+    if os.path.exists("./database_file/size.json"):
+        size_dict = json.load(open("./database_file/size.json", "r"))
     for i, repo_url in enumerate(repo_urls):
+        if repo_url in size_dict.keys():
+            continue
         size = get_repo_size(repo_url)
         if size is not None:
             size_dict[repo_url] = size
@@ -251,6 +255,7 @@ def store_tables(df_fixes):
     print(size_dict)
     sorted_x = sorted(size_dict.items(), key=operator.itemgetter(1))
     print(sorted_x)
+
     for repo_url, size in sorted_x:
         print(repo_url)
         pcount += 1
