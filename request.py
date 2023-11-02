@@ -1,8 +1,8 @@
 import requests
 
-header = {"Authorization": "Bearer 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"}
+header = {"Authorization": "Bearer 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"}
 resp = requests.get("https://api.github.com/rate_limit", headers=header)
-print(resp)
+print(resp.content)
 
 # from pydriller import Repository
 #
