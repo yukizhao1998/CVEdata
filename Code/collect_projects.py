@@ -28,6 +28,12 @@ repo_columns = [
 ]
 
 
+def remove_files_with_prefix(directory, prefix):
+    files = os.listdir(directory)
+    for file in files:
+        if file.startswith(prefix):
+            os.rmdir(os.path.join(directory, file))
+
 def find_unavailable_urls(urls):
     """
     returns the unavailable urls (repositories that are removed or made private)
@@ -332,6 +338,7 @@ def store_tables(df_fixes):
 
 # ---------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
+    remove_files_with_prefix("./database_file", "tmp")
     start_time = time.perf_counter()
     # Step (1) save CVEs(cve) and cwe tables
     cve_importer.import_cves()
