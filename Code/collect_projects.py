@@ -255,7 +255,6 @@ def store_tables(df_fixes):
     if os.path.exists("./database_file/size.json"):
         size_dict = json.load(open("./database_file/size.json", "r"))
     for i, repo_url in enumerate(repo_urls):
-        print(str(i) + "/" + str(len(repo_urls)) + ":" + repo_url)
         if repo_url in size_dict.keys() or "github.com" not in repo_url:
             continue
         size = get_repo_size(repo_url)

@@ -382,6 +382,7 @@ def extract_commits(repo_url, hashes):
     tmp_path = "./database_file/" + "tmp_" + generate_random_str(16)
     os.mkdir(tmp_path)
     repo_url += ".git"
+    print(tmp_path)
     for commit in Repository(path_to_repo=repo_url,
                              only_commits=hashes,
                              single=single_hash,
