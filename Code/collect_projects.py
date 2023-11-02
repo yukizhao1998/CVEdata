@@ -46,6 +46,7 @@ def find_unavailable_urls(urls):
     if len(already_judged['available']) + len(already_judged['unavailable']) == len(urls):
         print("skip url finding")
         already_judged["unavailable"].extend(not_github)
+        print(not_github)
         return already_judged['unavailable']
     for url in urls:
         if url in already_judged['available'] or url in already_judged['unavailable']:
