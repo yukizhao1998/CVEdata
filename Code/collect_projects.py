@@ -40,7 +40,7 @@ def find_unavailable_urls(urls):
     if os.path.exists('database_file/availability.json'):
         already_judged = json.load(open('database_file/availability.json', "r"))
     not_github = []
-    for u in already_judged["unavailable"]:
+    for u in already_judged["available"]:
         if "github.com" not in already_judged:
             not_github.append(u)
     if len(already_judged['available']) + len(already_judged['unavailable']) == len(urls):
@@ -76,7 +76,7 @@ def find_unavailable_urls(urls):
             already_judged['available'].append(url)
         json.dump(already_judged, open('database_file/availability.json', "w"))
     not_github = []
-    for u in already_judged["unavailable"]:
+    for u in already_judged["available"]:
         if "github.com" not in already_judged:
             not_github.append(u)
     already_judged["unavailable"].extend(not_github)
