@@ -381,9 +381,6 @@ def extract_commits(repo_url, hashes):
     #     return None, None, None
     tmp_path = "./database_file/" + "tmp_" + generate_random_str(16)
     os.mkdir(tmp_path)
-    print(hashes)
-    print(single_hash)
-    print(tmp_path)
     repo_url += ".git"
     for commit in Repository(path_to_repo=repo_url,
                              only_commits=hashes,
@@ -391,7 +388,6 @@ def extract_commits(repo_url, hashes):
                              num_workers=cf.NUM_WORKERS,
                              clone_repo_to=tmp_path).traverse_commits():
         cf.logger.debug(f'Processing {commit.hash}')
-        print(commit.hash)
         try:
             commit_row = {
                 'hash': commit.hash,
@@ -411,7 +407,6 @@ def extract_commits(repo_url, hashes):
                 'dmm_unit_interfacing': commit.dmm_unit_interfacing,
                 'dmm_unit_size': commit.dmm_unit_size,
             }
-            print(commit_row)
             commit_files, commit_methods = get_files(commit)
             repo_commits.append(commit_row)
             repo_files.extend(commit_files)

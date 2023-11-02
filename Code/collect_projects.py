@@ -176,29 +176,16 @@ def get_github_meta(repo_url, username, token):
     returns github meta-information of the repo_url
     """
     owner, project = repo_url.split('/')[-2], repo_url.split('/')[-1]
-    # meta_row = {}
-    #
-    # if username == 'None':
-    #     git_link = Github()
-    # else:
-    #     git_link = Github(login_or_token=token, user_agent=username)
-    #
-    # try:
-    #     git_user = git_link.get_user(owner)
-    #     repo = git_user.get_repo(project)
-    #     meta_row = {'repo_url': repo_url,
-    #                 'repo_name': repo.full_name,
-    #                 'description': repo.description,
-    #                 'date_created': repo.created_at,
-    #                 'date_last_push': repo.pushed_at,
-    #                 'homepage': repo.homepage,
-    #                 'repo_language': repo.language,
-    #                 'forks_count': repo.forks,
-    #                 'stars_count': repo.stargazers_count,
-    #                 'owner': owner}
+    meta_row = {}
+
+    if username == 'None':
+        git_link = Github()
+    else:
+        git_link = Github(login_or_token=token, user_agent=username)
+
     try:
-        repo = get_repo_info(repo_url)
-        print(repo)
+        git_user = git_link.get_user(owner)
+        repo = git_user.get_repo(project)
         meta_row = {'repo_url': repo_url,
                     'repo_name': repo.full_name,
                     'description': repo.description,
@@ -209,6 +196,18 @@ def get_github_meta(repo_url, username, token):
                     'forks_count': repo.forks,
                     'stars_count': repo.stargazers_count,
                     'owner': owner}
+    # try:
+    #     repo = get_repo_info(repo_url)
+    #     meta_row = {'repo_url': repo_url,
+    #                 'repo_name': repo.full_name,
+    #                 'description': repo.description,
+    #                 'date_created': repo.created_at,
+    #                 'date_last_push': repo.pushed_at,
+    #                 'homepage': repo.homepage,
+    #                 'repo_language': repo.language,
+    #                 'forks_count': repo.forks,
+    #                 'stars_count': repo.stargazers_count,
+    #                 'owner': owner}
     except BadCredentialsException as e:
         cf.logger.warning(f'Credential problem while accessing GitHub repository {repo_url}: {e}')
         pass  # or exit(1)
@@ -263,11 +262,11 @@ def store_tables(df_fixes):
         if size is not None:
             size_dict[repo_url] = size
         json.dump(size_dict, open("./database_file/size.json", "w"))
-    print(size_dict)
     sorted_x = sorted(size_dict.items(), key=operator.itemgetter(1))
-    print(sorted_x)
 
     for repo_url, size in sorted_x:
+        if size == 0:
+            continue
         print(repo_url)
         pcount += 1
         try:
