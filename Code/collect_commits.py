@@ -372,6 +372,7 @@ def extract_commits(repo_url, hashes):
     # giving first priority to 'single' parameter for single hash because
     # it has been tested that 'single' gets commit information in some cases where 'only_commits' does not,
     # for example: https://github.com/hedgedoc/hedgedoc.git/35b0d39a12aa35f27fba8c1f50b1886706e7efef
+    print(hashes)
     single_hash = None
     if len(hashes) == 1:
         single_hash = hashes[0]
@@ -383,7 +384,7 @@ def extract_commits(repo_url, hashes):
     os.mkdir(tmp_path)
     repo_url += ".git"
     print(tmp_path)
-    print(hashes)
+
     for commit in Repository(path_to_repo=repo_url,
                              only_commits=hashes,
                              single=single_hash,
