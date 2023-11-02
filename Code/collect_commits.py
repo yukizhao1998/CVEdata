@@ -383,6 +383,7 @@ def extract_commits(repo_url, hashes):
     os.mkdir(tmp_path)
     repo_url += ".git"
     print(tmp_path)
+    print(hashes)
     for commit in Repository(path_to_repo=repo_url,
                              only_commits=hashes,
                              single=single_hash,
