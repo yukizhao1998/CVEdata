@@ -130,7 +130,7 @@ def get_repo_size(url):
     #     "https": "127.0.0.1:55711",
     #     "http": "127.0.0.1:55711"
     # }
-    response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header, proxies=proxies)
+    response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header)
     # GitLab responds to unavailable repositories by redirecting to their login page.
     # This code is a bit brittle with a hardcoded URL but we want to allow for projects
     # that are redirected due to renaming or transferal to new owners...
@@ -149,7 +149,7 @@ def get_repo_info(url):
     #     "https": "127.0.0.1:55711",
     #     "http": "127.0.0.1:55711"
     # }
-    response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header, proxies=proxies)
+    response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header)
     # GitLab responds to unavailable repositories by redirecting to their login page.
     # This code is a bit brittle with a hardcoded URL but we want to allow for projects
     # that are redirected due to renaming or transferal to new owners...
