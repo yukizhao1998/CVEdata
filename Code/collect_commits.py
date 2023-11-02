@@ -361,6 +361,7 @@ def extract_commits(repo_url, hashes):
     repo_files = []
     repo_methods = []
 
+
     # ----------------------------------------------------------------------------------------------------------------
     # extracting commit-level data
     # if 'github' in repo_url:
