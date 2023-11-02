@@ -13,6 +13,7 @@ import database as db
 from collect_commits import extract_commits, extract_project_links
 import cve_importer
 from utils import prune_tables
+import shutil
 
 repo_columns = [
     'repo_url',
@@ -32,7 +33,7 @@ def remove_files_with_prefix(directory, prefix):
     files = os.listdir(directory)
     for file in files:
         if file.startswith(prefix):
-            os.rmdir(os.path.join(directory, file))
+            shutil.rmtree(os.path.join(directory, file))
 
 def find_unavailable_urls(urls):
     """

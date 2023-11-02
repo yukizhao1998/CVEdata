@@ -3,6 +3,6 @@ CVEfixes*.db
 CVEfixes*.sql.gz
 Code/database_file
 backup/
-./database_file
+database_file/
 request.py
 Code/__pycache__
