@@ -442,11 +442,11 @@ def extract_commits(repo_url, hashes):
                 bug_inducing_commit = git.get_commit(hash)
                 repo_bug_inducing_commits.append(get_bug_inducing_commit_row(commit.hash, bug_inducing_commit, repo_url))
                 bug_inducing_commit_files, bug_inducing_commit_methods = get_files(bug_inducing_commit)
+                repo_bug_inducing_files.extend(bug_inducing_commit_files)
+                repo_bug_inducing_methods.extend(bug_inducing_commit_methods)
             repo_commits.append(commit_row)
             repo_files.extend(commit_files)
             repo_methods.extend(commit_methods)
-            repo_bug_inducing_files.extend(bug_inducing_commit_files)
-            repo_bug_inducing_methods.extend(bug_inducing_commit_methods)
         except Exception as e:
             cf.logger.warning(f'Problem while fetching the commits: {e}')
             pass
