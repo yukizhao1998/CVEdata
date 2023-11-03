@@ -8,7 +8,7 @@ import zipfile
 import pandas as pd
 import configuration as cf
 from guesslang import Guess
-from pydriller import Repository
+from pydriller import Repository, Git
 from utils import log_commit_urls
 import requests
 from git import Repo
@@ -23,6 +23,26 @@ fixes_columns = [
 
 commit_columns = [
     'hash',
+    'repo_url',
+    'author',
+    'author_date',
+    'author_timezone',
+    'committer',
+    'committer_date',
+    'committer_timezone',
+    'msg',
+    'merge',
+    'parents',
+    'num_lines_added',
+    'num_lines_deleted',
+    'dmm_unit_complexity',
+    'dmm_unit_interfacing',
+    'dmm_unit_size'
+]
+
+bug_inducing_commit_columns = [
+    'hash',
+    'fix_hash',
     'repo_url',
     'author',
     'author_date',
@@ -310,29 +330,6 @@ def download_github_project(repository_url, local_directory):
 
 
 def download_repo(repo_url):
-    # url_path = repo_url.split("/")
-    # username = url_path[-2]
-    # repo = url_path[-1]
-    # header = {"Authorization": "Bearer " + cf.TOKEN}
-    # git_api_url = "https://api.github.com/repos/%s/%s/zipball" % (username, repo)
-    # response = requests.get(url=git_api_url, headers=header)
-    # repo_dir = None
-    # tmp_path = "./database_file/" + "tmp_" + generate_random_str(16)
-    # print(git_api_url)
-    # if response.status_code == 200:
-    #     os.mkdir(tmp_path)
-    #     zip_path = os.path.join(tmp_path, repo + ".zip")
-    #     with open(zip_path, "wb") as file:
-    #         file.write(response.content)
-    #     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-    #         zip_ref.extractall(tmp_path)
-    #     os.remove(zip_path)
-    #     if len(os.listdir(tmp_path)) > 0:
-    #         repo_dir = os.path.join(tmp_path, os.listdir(tmp_path)[0])
-    # else:
-    #     print("无法通过git api下载%s项目。" % repo_url)
-    # return repo_dir, tmp_path
-
     url_path = repo_url.replace("https://github.com", "https://gitclone.com/github.com")
     url_path += ".git"
     tmp_path = "./database_file/" + "tmp_" + generate_random_str(16)
@@ -344,7 +341,48 @@ def download_repo(repo_url):
     download_github_project(url_path, repo_dir)
     return repo_dir, tmp_path
 
+def get_commit_row(commit, repo_url):
+    commit_row = {
+        'hash': commit.hash,
+        'repo_url': repo_url,
+        'author': commit.author.name,
+        'author_date': commit.author_date,
+        'author_timezone': commit.author_timezone,
+        'committer': commit.committer.name,
+        'committer_date': commit.committer_date,
+        'committer_timezone': commit.committer_timezone,
+        'msg': commit.msg,
+        'merge': commit.merge,
+        'parents': commit.parents,
+        'num_lines_added': commit.insertions,
+        'num_lines_deleted': commit.deletions,
+        'dmm_unit_complexity': commit.dmm_unit_complexity,
+        'dmm_unit_interfacing': commit.dmm_unit_interfacing,
+        'dmm_unit_size': commit.dmm_unit_size,
+    }
+    return commit_row
 
+def get_bug_inducing_commit_row(fix_commit, commit, repo_url):
+    commit_row = {
+        'fix_hash': fix_commit,
+        'hash': commit.hash,
+        'repo_url': repo_url,
+        'author': commit.author.name,
+        'author_date': commit.author_date,
+        'author_timezone': commit.author_timezone,
+        'committer': commit.committer.name,
+        'committer_date': commit.committer_date,
+        'committer_timezone': commit.committer_timezone,
+        'msg': commit.msg,
+        'merge': commit.merge,
+        'parents': commit.parents,
+        'num_lines_added': commit.insertions,
+        'num_lines_deleted': commit.deletions,
+        'dmm_unit_complexity': commit.dmm_unit_complexity,
+        'dmm_unit_interfacing': commit.dmm_unit_interfacing,
+        'dmm_unit_size': commit.dmm_unit_size,
+    }
+    return commit_row
 
 
 def extract_commits(repo_url, hashes):
@@ -357,16 +395,16 @@ def extract_commits(repo_url, hashes):
     :param hashes: list of hashes of the commits to collect
     :return dataframes: at commit level and file level.
     """
+    repo_bug_inducing_commits = []
+    repo_bug_inducing_files = []
+    repo_bug_inducing_methods = []
     repo_commits = []
     repo_files = []
     repo_methods = []
-
-
     # ----------------------------------------------------------------------------------------------------------------
     # extracting commit-level data
     # if 'github' in repo_url:
     #     repo_url = repo_url + '.git'
-
     cf.logger.debug(f'Extracting commits for {repo_url} with {cf.NUM_WORKERS} worker(s) looking for the following hashes:')
     log_commit_urls(repo_url, hashes)
 
@@ -378,9 +416,7 @@ def extract_commits(repo_url, hashes):
     if len(hashes) == 1:
         single_hash = hashes[0]
         hashes = None
-    # repo_dir, tmp_path = download_repo(repo_url)
-    # if repo_dir is None:
-    #     return None, None, None
+
     tmp_path = "./database_file/" + "tmp_" + generate_random_str(16)
     os.mkdir(tmp_path)
     repo_url += ".git"
@@ -393,28 +429,24 @@ def extract_commits(repo_url, hashes):
                              clone_repo_to=tmp_path).traverse_commits():
         cf.logger.debug(f'Processing {commit.hash}')
         try:
-            commit_row = {
-                'hash': commit.hash,
-                'repo_url': repo_url,
-                'author': commit.author.name,
-                'author_date': commit.author_date,
-                'author_timezone': commit.author_timezone,
-                'committer': commit.committer.name,
-                'committer_date': commit.committer_date,
-                'committer_timezone': commit.committer_timezone,
-                'msg': commit.msg,
-                'merge': commit.merge,
-                'parents': commit.parents,
-                'num_lines_added': commit.insertions,
-                'num_lines_deleted': commit.deletions,
-                'dmm_unit_complexity': commit.dmm_unit_complexity,
-                'dmm_unit_interfacing': commit.dmm_unit_interfacing,
-                'dmm_unit_size': commit.dmm_unit_size,
-            }
+            commit_row = get_commit_row(commit, repo_url)
             commit_files, commit_methods = get_files(commit)
+            git = Git(commit.project_path)
+            try:
+                szz = git.get_commits_last_modified_lines(commit)
+            except IndexError:
+                continue
+            bug_inducing_commit_hashes = set(c for sublist in [*szz.values()] for c in sublist)
+            print("Bug-inducing hashes: ", bug_inducing_commit)
+            for hash in bug_inducing_commit_hashes:
+                bug_inducing_commit = git.get_commit(hash)
+                repo_bug_inducing_commits.append(get_bug_inducing_commit_row(commit.hash, bug_inducing_commit, repo_url))
+                bug_inducing_commit_files, bug_inducing_commit_methods = get_files(bug_inducing_commit)
             repo_commits.append(commit_row)
             repo_files.extend(commit_files)
             repo_methods.extend(commit_methods)
+            repo_bug_inducing_files.extend(bug_inducing_commit_files)
+            repo_bug_inducing_methods.extend(bug_inducing_commit_methods)
         except Exception as e:
             cf.logger.warning(f'Problem while fetching the commits: {e}')
             pass
@@ -437,4 +469,25 @@ def extract_commits(repo_url, hashes):
     else:
         df_repo_methods = None
 
-    return df_repo_commits, df_repo_files, df_repo_methods
+    if repo_bug_inducing_commits:
+        df_repo_bug_inducing_commits = pd.DataFrame.from_dict(repo_bug_inducing_commits)
+        df_repo_bug_inducing_commits = df_repo_bug_inducing_commits[bug_inducing_commit_columns]
+    else:
+        df_repo_bug_inducing_commits = None
+
+    if repo_bug_inducing_files:
+        df_repo_bug_inducing_files = pd.DataFrame.from_dict(repo_bug_inducing_files)
+        df_repo_bug_inducing_files = df_repo_bug_inducing_files[file_columns]
+    else:
+        df_repo_bug_inducing_files = None
+
+    if repo_bug_inducing_methods:
+        df_repo_bug_inducing_methods = pd.DataFrame.from_dict(repo_bug_inducing_methods)
+        df_repo_bug_inducing_methods = df_repo_bug_inducing_methods[method_columns]
+    else:
+        df_repo_bug_inducing_methods = None
+
+    return df_repo_commits, df_repo_files, df_repo_methods, df_repo_bug_inducing_commits, df_repo_bug_inducing_files, \
+           df_repo_bug_inducing_methods
+
+

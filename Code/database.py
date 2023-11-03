@@ -54,6 +54,11 @@ def fetchone_query(table_name, col, value):
     result = cursor.fetchone()
     return True if result is not None else False
 
+def drop_table(table_name):
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS " + table_name)
+    conn.commit()
+    cursor.close()
 
 if not conn:
     conn = create_connection(cf.DATABASE)

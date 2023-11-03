@@ -144,14 +144,7 @@ def get_ref_links():
 
 def get_repo_size(url):
     header = {"Authorization": "Bearer " + cf.TOKEN}
-    # proxies = {
-    #     "https": "127.0.0.1:55711",
-    #     "http": "127.0.0.1:55711"
-    # }
     response = requests.get(url=url.replace("https://github.com/", "https://api.github.com/repos/"), headers=header)
-    # GitLab responds to unavailable repositories by redirecting to their login page.
-    # This code is a bit brittle with a hardcoded URL but we want to allow for projects
-    # that are redirected due to renaming or transferal to new owners...
     if (response.status_code >= 400) or \
             (response.is_redirect and
              response.headers['location'] == 'https://gitlab.com/users/sign_in'):
@@ -259,9 +252,12 @@ def store_tables(df_fixes):
     # hashes = ['003c62d28ae438aa8943cb31535563397f838a2c', 'fd']
     pcount = 0
     size_dict = {}
+    # get sizes of the repositories and sort
     if os.path.exists("./database_file/size.json"):
         size_dict = json.load(open("./database_file/size.json", "r"))
     for i, repo_url in enumerate(repo_urls):
+        if i != 0 and i % 10 == 0:
+            remove_files_with_prefix("./database_file", "tmp")
         if repo_url in size_dict.keys() or "github.com" not in repo_url:
             continue
         size = get_repo_size(repo_url)
@@ -269,11 +265,21 @@ def store_tables(df_fixes):
             size_dict[repo_url] = size
         json.dump(size_dict, open("./database_file/size.json", "w"))
     sorted_x = sorted(size_dict.items(), key=operator.itemgetter(1))
-
-    for repo_url, size in sorted_x:
-        if size == 0:
+    # repo summary
+    repo_summary_json = "./database_file/repo_summary.json"
+    repo_summary = {"fail": {}, "success": {}}
+    if os.path.exists(repo_summary_json):
+        repo_summary = json.load(open(repo_summary_json, "r"))
+    for i, (repo_url, size) in enumerate(sorted_x):
+        print(str(i) + "/" + str(len(sorted_x)) + ": " + repo_url)
+        if repo_url in repo_summary["fail"].keys() or repo_url in repo_summary["success"].keys():
+            print("already done")
             continue
-        print(repo_url)
+        if size == 0:
+            repo_summary["fail"][repo_url] = "repo with size 0"
+            json.dump(repo_summary, open(repo_summary_json, "w"))
+            print("success cnt:", len(repo_summary["success"]), "failure cnt:", len(repo_summary["fail"]))
+            continue
         pcount += 1
         try:
             df_single_repo = df_fixes[df_fixes.repo_url == repo_url]
@@ -282,65 +288,97 @@ def store_tables(df_fixes):
             cf.logger.info(f'Retrieving fixes for repo {pcount} of {len(repo_urls)} - {repo_url.rsplit("/")[-1]}')
 
             # extract_commits method returns data at different granularity levels
-            if repo_url.endswith("torvalds/linux"):
-                continue
-            df_commit, df_file, df_method = extract_commits(repo_url, hashes)
+            df_commit, df_file, df_method, df_bug_inducing_commit, df_bug_inducing_file, df_bug_inducing_method = extract_commits(repo_url, hashes)
 
-            if df_commit is not None:
+            if df_commit is not None and df_bug_inducing_commit is not None:
                 with db.conn:
                     # ----------------appending each project data to the tables-------------------------------
                     df_commit = df_commit.applymap(str)
                     df_commit.to_sql(name="commits", con=db.conn, if_exists="append", index=False)
                     cf.logger.debug(f'#Commits: {len(df_commit)}')
 
+                    df_bug_inducing_commit = df_bug_inducing_commit.applymap(str)
+                    df_bug_inducing_commit.to_sql(name="bug_inducing_commits", con=db.conn, if_exists="append", index=False)
+                    print("#Bug Inducing Commits:", len(df_bug_inducing_commit))
+
                     if df_file is not None:
                         df_file = df_file.applymap(str)
                         df_file.to_sql(name="file_change", con=db.conn, if_exists="append", index=False)
                         cf.logger.debug(f'#Files: {len(df_file)}')
+                    else:
+                        df_file = []
 
                     if df_method is not None:
                         df_method = df_method.applymap(str)
                         df_method.to_sql(name="method_change", con=db.conn, if_exists="append", index=False)
                         cf.logger.debug(f'#Methods: {len(df_method)}')
+                    else:
+                        df_method = []
+
+                    if df_bug_inducing_file is not None:
+                        df_bug_inducing_file = df_bug_inducing_file.applymap(str)
+                        df_bug_inducing_file.to_sql(name="bug_inducing_file_change", con=db.conn, if_exists="append", index=False)
+                        print("#Bug Inducing Files:", len(df_bug_inducing_file))
+                    else:
+                        df_bug_inducing_file = []
+
+                    if df_bug_inducing_method is not None:
+                        df_bug_inducing_method = df_bug_inducing_method.applymap(str)
+                        df_bug_inducing_method.to_sql(name="bug_inducing_method_change", con=db.conn, if_exists="append", index=False)
+                        print("#Bug Inducing Methods:", len(df_bug_inducing_method))
+                    else:
+                        df_bug_inducing_method = []
 
                     save_repo_meta(repo_url)
+                    repo_summary["success"][repo_url] = {"#fix commit": len(df_commit),
+                                                         "#bug inducing commit": len(df_bug_inducing_commit),
+                                                         "#fix file": len(df_file),
+                                                         "#bug inducing file": len(df_bug_inducing_file),
+                                                         "#fix method": len(df_method),
+                                                         "#bug inducing method": len(df_bug_inducing_method)}
             else:
+                repo_summary["fail"][repo_url] = "Could not retrieve commit information"
                 cf.logger.warning(f'Could not retrieve commit information from: {repo_url}')
-
         except Exception as e:
+            repo_summary["fail"][repo_url] = "Problem occurred while retrieving the project"
             cf.logger.warning(f'Problem occurred while retrieving the project: {repo_url}: {e}')
-            pass  # skip fetching repository if is not available.
-
-    cf.logger.debug('-' * 70)
-    if db.table_exists('commits'):
-        commit_count = str(pd.read_sql("SELECT count(*) FROM commits", con=db.conn).iloc[0].iloc[0])
-        cf.logger.debug(f'Number of commits retrieved from all the repos: {commit_count}')
-    else:
-        cf.logger.warning('The commits table does not exist')
-
-    if db.table_exists('file_change'):
-        file_count = str(pd.read_sql("SELECT count(*) from file_change;", con=db.conn).iloc[0].iloc[0])
-        cf.logger.debug(f'Number of files changed by all the commits: {file_count}')
-    else:
-        cf.logger.warning('The file_change table does not exist')
-
-    if db.table_exists('method_change'):
-        method_count = str(pd.read_sql("SELECT count(*) from method_change;", con=db.conn).iloc[0].iloc[0])
-        cf.logger.debug(f'Number of total methods fetched by all the commits: {method_count}')
-
-        vul_method_count = \
-        pd.read_sql('SELECT count(*) from method_change WHERE before_change="True";', con=db.conn).iloc[0].iloc[0]
-        cf.logger.debug(f"Number of vulnerable methods fetched by all the commits: {vul_method_count}")
-    else:
-        cf.logger.warning('The method_change table does not exist')
-
-    cf.logger.info('-' * 70)
+        print("success cnt:", len(repo_summary["success"]), "failure cnt:", len(repo_summary["fail"]))
+        json.dump(repo_summary, open(repo_summary_json, "w"))
+    # cf.logger.debug('-' * 70)
+    # if db.table_exists('commits'):
+    #     commit_count = str(pd.read_sql("SELECT count(*) FROM commits", con=db.conn).iloc[0].iloc[0])
+    #     cf.logger.debug(f'Number of commits retrieved from all the repos: {commit_count}')
+    # else:
+    #     cf.logger.warning('The commits table does not exist')
+    #
+    # if db.table_exists('file_change'):
+    #     file_count = str(pd.read_sql("SELECT count(*) from file_change;", con=db.conn).iloc[0].iloc[0])
+    #     cf.logger.debug(f'Number of files changed by all the commits: {file_count}')
+    # else:
+    #     cf.logger.warning('The file_change table does not exist')
+    #
+    # if db.table_exists('method_change'):
+    #     method_count = str(pd.read_sql("SELECT count(*) from method_change;", con=db.conn).iloc[0].iloc[0])
+    #     cf.logger.debug(f'Number of total methods fetched by all the commits: {method_count}')
+    #
+    #     vul_method_count = \
+    #     pd.read_sql('SELECT count(*) from method_change WHERE before_change="True";', con=db.conn).iloc[0].iloc[0]
+    #     cf.logger.debug(f"Number of vulnerable methods fetched by all the commits: {vul_method_count}")
+    # else:
+    #     cf.logger.warning('The method_change table does not exist')
+    #
+    # cf.logger.info('-' * 70)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     remove_files_with_prefix("./database_file", "tmp")
     start_time = time.perf_counter()
+    for table_name in ["commits", "file_change", "repository", "method_change"]:
+        if db.table_exists(table_name):
+            print("find " + table_name)
+            db.drop_table(table_name)
+            print(db.table_exists(table_name))
     # Step (1) save CVEs(cve) and cwe tables
     cve_importer.import_cves()
     # Step (2) save commit-, file-, and method- level data tables to the database
