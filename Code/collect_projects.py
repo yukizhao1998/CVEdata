@@ -337,6 +337,8 @@ def store_tables(df_fixes):
                                                          "#bug inducing file": len(df_bug_inducing_file),
                                                          "#fix method": len(df_method),
                                                          "#bug inducing method": len(df_bug_inducing_method)}
+                    if repo_url in repo_summary["fail"]:
+                        repo_summary["fail"].pop("repo_url")
             else:
                 repo_summary["fail"][repo_url] = "Could not retrieve commit information"
                 cf.logger.warning(f'Could not retrieve commit information from: {repo_url}')
