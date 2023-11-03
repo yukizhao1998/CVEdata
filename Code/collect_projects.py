@@ -282,6 +282,16 @@ def store_tables(df_fixes):
             print("success cnt:", len(repo_summary["success"]), "failure cnt:", len(repo_summary["fail"]))
             continue
         pcount += 1
+
+
+
+        df_single_repo = df_fixes[df_fixes.repo_url == repo_url]
+        hashes = list(df_single_repo.hash.unique())
+        cf.logger.info('-' * 70)
+        cf.logger.info(f'Retrieving fixes for repo {pcount} of {len(repo_urls)} - {repo_url.rsplit("/")[-1]}')
+
+        # extract_commits method returns data at different granularity levels
+
         try:
             df_single_repo = df_fixes[df_fixes.repo_url == repo_url]
             hashes = list(df_single_repo.hash.unique())
@@ -338,7 +348,7 @@ def store_tables(df_fixes):
                                                          "#fix method": len(df_method),
                                                          "#bug inducing method": len(df_bug_inducing_method)}
                     if repo_url in repo_summary["fail"]:
-                        repo_summary["fail"].pop("repo_url")
+                        repo_summary["fail"].pop(repo_url)
             else:
                 repo_summary["fail"][repo_url] = "Could not retrieve commit information"
                 cf.logger.warning(f'Could not retrieve commit information from: {repo_url}')
