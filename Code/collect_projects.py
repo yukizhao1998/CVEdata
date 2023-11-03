@@ -374,7 +374,8 @@ def store_tables(df_fixes):
 if __name__ == '__main__':
     remove_files_with_prefix("./database_file", "tmp")
     start_time = time.perf_counter()
-    for table_name in ["commits", "file_change", "repository", "method_change"]:
+    for table_name in ["commits", "file_change", "repository", "method_change", "bug_inducing_commits",
+                       "bug_inducing_file_change", "bug_inducing_method_change"]:
         if db.table_exists(table_name):
             print("find " + table_name)
             db.drop_table(table_name)
