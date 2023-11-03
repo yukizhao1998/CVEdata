@@ -256,8 +256,6 @@ def store_tables(df_fixes):
     if os.path.exists("./database_file/size.json"):
         size_dict = json.load(open("./database_file/size.json", "r"))
     for i, repo_url in enumerate(repo_urls):
-        if i != 0 and i % 10 == 0:
-            remove_files_with_prefix("./database_file", "tmp")
         if repo_url in size_dict.keys() or "github.com" not in repo_url:
             continue
         size = get_repo_size(repo_url)
@@ -271,6 +269,8 @@ def store_tables(df_fixes):
     if os.path.exists(repo_summary_json):
         repo_summary = json.load(open(repo_summary_json, "r"))
     for i, (repo_url, size) in enumerate(sorted_x):
+        if i != 0 and i % 10 == 0:
+            remove_files_with_prefix("./database_file", "tmp")
         print(str(i) + "/" + str(len(sorted_x)) + ": " + repo_url)
         if (repo_url in repo_summary["fail"].keys() and "Problem occurred while retrieving the project" not in repo_summary["fail"][repo_url]) \
                 or repo_url in repo_summary["success"].keys():
@@ -282,13 +282,6 @@ def store_tables(df_fixes):
             print("success cnt:", len(repo_summary["success"]), "failure cnt:", len(repo_summary["fail"]))
             continue
         pcount += 1
-
-
-
-        df_single_repo = df_fixes[df_fixes.repo_url == repo_url]
-        hashes = list(df_single_repo.hash.unique())
-        cf.logger.info('-' * 70)
-        cf.logger.info(f'Retrieving fixes for repo {pcount} of {len(repo_urls)} - {repo_url.rsplit("/")[-1]}')
 
         # extract_commits method returns data at different granularity levels
 
