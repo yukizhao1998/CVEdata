@@ -23,9 +23,13 @@ def fetch_query(query):
     cursor = conn.cursor()
     cursor.execute(query)
     result = cursor.fetchall()
-    return result is not None else False
+    return result if not None else False
 
 if __name__ == "__main__":
     conn = create_connection(cf.DATABASE)
     sql = "SELECT * FROM bug_inducing_commits"
+    print(fetch_query(sql))
+    sql = "SELECT * FROM bug_inducing_file_change"
+    print(fetch_query(sql))
+    sql = "SELECT * FROM bug_inducing_method_change"
     print(fetch_query(sql))
