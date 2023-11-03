@@ -272,7 +272,8 @@ def store_tables(df_fixes):
         repo_summary = json.load(open(repo_summary_json, "r"))
     for i, (repo_url, size) in enumerate(sorted_x):
         print(str(i) + "/" + str(len(sorted_x)) + ": " + repo_url)
-        if repo_url in repo_summary["fail"].keys() or repo_url in repo_summary["success"].keys():
+        if (repo_url in repo_summary["fail"].keys() and "Problem occurred while retrieving the project" not in repo_summary["fail"][repo_url]) \
+                or repo_url in repo_summary["success"].keys():
             print("already done")
             continue
         if size == 0:

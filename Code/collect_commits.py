@@ -437,7 +437,7 @@ def extract_commits(repo_url, hashes):
             except IndexError:
                 continue
             bug_inducing_commit_hashes = set(c for sublist in [*szz.values()] for c in sublist)
-            print("Bug-inducing hashes: ", bug_inducing_commit)
+            print("Bug-inducing hashes: ", bug_inducing_commit_hashes)
             for hash in bug_inducing_commit_hashes:
                 bug_inducing_commit = git.get_commit(hash)
                 repo_bug_inducing_commits.append(get_bug_inducing_commit_row(commit.hash, bug_inducing_commit, repo_url))
