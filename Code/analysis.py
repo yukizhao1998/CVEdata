@@ -27,9 +27,9 @@ def fetch_query(query):
 
 if __name__ == "__main__":
     conn = create_connection(cf.DATABASE)
-    sql = "SELECT * FROM bug_inducing_commits"
+    sql = "SELECT COUNT(*) FROM bug_inducing_commits"
     print(fetch_query(sql))
-    sql = "SELECT * FROM bug_inducing_file_change"
+    sql = "SELECT COUNT(*) FROM bug_inducing_file_change"
     print(fetch_query(sql))
-    sql = "SELECT * FROM bug_inducing_method_change"
+    sql = "SELECT COUNT(*) FROM bug_inducing_method_change"
     print(fetch_query(sql))
