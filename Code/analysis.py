@@ -23,7 +23,7 @@ def fetch_query(query):
     cursor = conn.cursor()
     cursor.execute(query)
     result = cursor.fetchall()
-    return True if result is not None else False
+    return result is not None else False
 
 if __name__ == "__main__":
     conn = create_connection(cf.DATABASE)
