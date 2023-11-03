@@ -5,5 +5,5 @@ Code/database_file
 backup/
 database_file/
 request.py
-Code/__pycache__/
+Code/__pycache__/*
 .idea/
