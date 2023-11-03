@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_2JytLR6kKKDYYVnM/freeradius-server" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_2Yk77D3tCWpU9iDM/uzbl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_2mqaCMZSQ7J9bswt/asterisk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_3dUmBye9HXwyHroD/deep-override" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_4X29CBOSGXQFw1qi/ruby" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_6xaqd4ouKWHtINnL/rails" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_9fCdyNKH9bg0yKoH/freeradius-server" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_ArQJRwN9Y8CeoVXB/html-parser" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_D9T68DpVLZYxeZLQ/wip" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_ECPU4x4W7mHt3KCx/fittr-flickr" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_EnhFuDJ0IuvAe4DA/irssi-proxy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_HF1OLQoeoMoec00V/killport" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_HaMb3ZWLxZdXd0bR/simplesamlphp-module-openid" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_I8tybaXVsM3BftT5/OcoMon-Research" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_ISGJlHczanYg44y1/mel-spintax" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_Ia4Is0BPl4Dg1H1g/mt7688-wiscan" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_Iiigq4miZtWqnuzh/wiki-scratchsig" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_IkIDsgcMdMTy9Zr3/gitolite" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_K0zeSsXG05AkA2Kq/p4" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_Pko1iTHX2mhXVrWC/dot" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_RefgnkOA1qu15aTW/titlelink" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_SKLcO3bwJxuo2v1o/pango" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_VYnzs4LCxiFDZs5R/simplesamlphp-module-infocard" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_WOMfqYypLx5hEgug/rails" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_XD9d6aWYHPVIcrwT/linux-cmdline" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_ZAAQHn5BxiF8XcNx/exec-local-bin" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_bIBAly1E0GNuzpSk/beanstalkd" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_cgWocEtE02gRFZsx/PHPMailer" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_de1hH4mXvp5NH3x3/nodejs-tmpl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_knzBAmueO40pop1h/patchmerge" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_mCnOoxXFh36WC4bg/go-unzip" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_mbSqMDVN2qNrzLAC/exploit" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_nA5mscC1PRkRBXgo/click-reminder" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_pB1kDx60JTM1GxmY/cached-path-relative" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_qTLk5IJUaMCASM2J/jopenid" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_uUrvgODa35lPdJRT/Zope" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_wF7fuIVlgEmSa08o/spree" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Code/database_file/tmp_wsNtzcXIrJJkhM8d/kill-by-port" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/projects/asterisk" vcs="Git" />
   </component>
 </project>

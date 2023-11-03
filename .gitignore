@@ -6,3 +6,4 @@ backup/
 database_file/
 request.py
 Code/__pycache__/
+.idea/
