@@ -10,6 +10,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 from pandas import json_normalize
 import configuration as cf
+import os
 
 # --------------------------------------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ def extract_cwe():
     cwe_doc = sorted(Path(cf.DATA_PATH).glob('cwec_*.xml'))
     if len(cwe_doc) > 0:
         cf.logger.info('Reusing the CWE XML file that is already in the directory')
-        xtree = et.parse(cf.DATA_PATH + cwe_doc[-1])
+        xtree = et.parse(os.path.join(cf.DATA_PATH, cwe_doc[-1].name))
     else:
         cwe_url = 'https://cwe.mitre.org/data/xml/cwec_latest.xml.zip'
         cwe_zip = ZipFile(BytesIO(urlopen(cwe_url).read()))

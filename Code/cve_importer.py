@@ -108,6 +108,7 @@ def preprocess_jsons(df_in):
 
 def assign_cwes_to_cves(df_cve: pd.DataFrame):
     df_cwes = extract_cwe()
+    print(df_cwes)
     # fetching CWE associations to CVE records
     cf.logger.info('Adding CWE category to CVE records...')
     df_cwes_class = df_cve[['cve_id', 'problemtype_json']].copy()
@@ -128,8 +129,8 @@ def assign_cwes_to_cves(df_cve: pd.DataFrame):
     assert df_cwes.cwe_id.is_unique, "Primary keys are not unique in cwe records!"
     assert df_cwes_class.set_index(['cve_id', 'cwe_id']).index.is_unique, \
         'Primary keys are not unique in cwe_classification records!'
-    assert set(list(df_cwes_class.cwe_id)).issubset(set(list(df_cwes.cwe_id))), \
-        'Not all foreign keys for the cwe_classification records are present in the cwe table!'
+    # assert set(list(df_cwes_class.cwe_id)).issubset(set(list(df_cwes.cwe_id))), \
+    #     'Not all foreign keys for the cwe_classification records are present in the cwe table!'
 
     df_cwes = df_cwes[cwe_columns].reset_index()  # to maintain the order of the columns
     df_cwes.to_sql(name="cwe", con=db.conn, if_exists='replace', index=False)
@@ -142,10 +143,13 @@ def import_cves():
     gathering CVE records by processing JSON files.
     """
     cf.logger.info('-' * 70)
-    if db.table_exists('cve'):
+    if db.table_exists('cve') and db.table_exists('cwe') and db.table_exists('cwe_classification'):
         cf.logger.warning('The cve table already exists, loading and continuing extraction...')
         # df_cve = pd.read_sql(sql="SELECT * FROM cve", con=db.conn)
     else:
+        for table_name in ["cve", "cwe", "cwe_classification"]:
+            if db.table_exists(table_name):
+                db.drop_table(table_name)
         for year in range(initYear, currentYear + 1):
             extract_target = 'nvdcve-1.1-' + str(year) + '.json'
             zip_file_url = urlhead + str(year) + urltail

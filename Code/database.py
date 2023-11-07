@@ -60,5 +60,9 @@ def drop_table(table_name):
     conn.commit()
     cursor.close()
 
+def execute(query):
+    cursor = conn.cursor()
+    return cursor.execute(query)
+
 if not conn:
     conn = create_connection(cf.DATABASE)
